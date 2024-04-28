@@ -1,23 +1,51 @@
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Scanner;
+import com.api.MonedasApi;
 
 public class Principal {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Scanner lectura = new Scanner(System.in);
-        System.out.println("hola mundo");
-        System.out.println("prueba");
-        String direccionApi = "https://v6.exchangerate-api.com/v6/50c33799565cdf1cf11364c0/latest/USD";
+    public static void main(String[] args) {
+        MonedasApi moneda = new MonedasApi();
+        Interfaz interfaceUsuario = new Interfaz();
+        Monedas conversorMoneda = new Monedas();
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(direccionApi)).build();
-        HttpResponse<String> response = client.send(request , HttpResponse.BodyHandlers.ofString());
+        try {
+            boolean continuar = true;
+            while (continuar) {
 
-        String data = response.body();
-        System.out.println(data);
+                interfaceUsuario.menu();
+
+
+                Comparador<String, String> monedaPar = interfaceUsuario.opcionInput();
+
+
+                String salida = monedaPar.getFirst();
+                if (salida == "salir") {
+                    continuar = false;
+                } else {
+
+                    String monedaInicial = monedaPar.getFirst();
+                    String monedaFinal = monedaPar.getSecond();
+
+
+                    var monedaDeCambio = moneda.MonedasData(monedaInicial);
+
+
+                    Double monedaOrigen = monedaDeCambio.conversion_rates().get(monedaInicial);
+                    Double monedaDestino = monedaDeCambio.conversion_rates().get(monedaFinal);
+
+
+                    conversorMoneda.conversorMoneda(monedaDestino, monedaOrigen, monedaInicial, monedaFinal);
+                }
+
+            }
+        }catch (RuntimeException  e){
+            System.out.println("Finalizando la aplicación.");
+        }
+
+
+
+
+
 
     }
 }
+
+
